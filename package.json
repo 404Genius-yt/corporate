@@ -8,7 +8,6 @@
     "start": "next start"
   },
   "dependencies": {
-    "@clerk/elements": "^0.23.84",
     "@clerk/nextjs": "^6.35.3",
     "mongoose": "^8.20.1",
     "next": "16.0.3",
