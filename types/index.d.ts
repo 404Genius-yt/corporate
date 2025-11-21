@@ -9,7 +9,6 @@ declare type UpdateUserParams = {
   lastName: string;
   age: number;
   skill: string;
-  resume: Document
 }
 
 declare type UserParams = {
@@ -20,7 +19,6 @@ declare type UserParams = {
   lastName: string;
   age: number;
   skill: string;
-  resume: Document;
   createdAt: Date
   updatedAt: Date
 }
