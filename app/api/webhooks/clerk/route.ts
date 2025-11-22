@@ -67,21 +67,10 @@ export async function POST(req: Request) {
     if (eventType === "user.created") {
       const { id, email_addresses, username,} = evt.data;
 
-      // Validate required fields
-      if (!email_addresses[0].email_address || email_addresses.length === 0) {
-        return NextResponse.json(
-          { error: "Email address is required" },
-          { status: 400 }
-        );
-      }
-
-      // Generate username from email if not provided
-      const userUsername = username || email_addresses[0].email_address.split("@")[0];
-
       const user = {
         clerkId: id,
         email: email_addresses[0].email_address,
-        username: userUsername,
+        username: username,
       };
 
       try {
