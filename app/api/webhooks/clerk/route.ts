@@ -63,65 +63,127 @@ export async function POST(req: Request) {
     // Get the ID and type
     const eventType = evt.type;
 
+    // Log the event for debugging
+    console.log("Webhook event received:", eventType);
+    try {
+      console.log("Event data structure:", JSON.stringify(evt?.data || {}, null, 2));
+    } catch (logError) {
+      console.error("Error logging event data:", logError);
+    }
+
     // CREATE
     if (eventType === "user.created") {
-      const { id, email_addresses, username } = evt.data;
-
-      // Validate email_addresses exists and has at least one email
-      if (!email_addresses || !Array.isArray(email_addresses) || email_addresses.length === 0) {
-        console.error("No email addresses found in webhook data:", evt.data);
-        return NextResponse.json(
-          { error: "Email address is required but not provided" },
-          { status: 400 }
-        );
-      }
-
-      // Get the first email address
-      const email = email_addresses[0]?.email_address;
-      if (!email) {
-        console.error("Email address is missing:", email_addresses);
-        return NextResponse.json(
-          { error: "Invalid email address format" },
-          { status: 400 }
-        );
-      }
-
-      // Generate username from email if not provided
-      const userUsername = username || email.split("@")[0];
-
-      const user = {
-        clerkId: id,
-        email: email,
-        username: userUsername,
-      };
-
       try {
-        const newUser = await User.create(user);
-        const client = await clerkClient();
-
-        // Set public metadata
-        if (newUser) {
-          await client.users.updateUserMetadata(id, {
-            publicMetadata: {
-              userId: newUser._id.toString(),
-            },
-          });
-        }
-
-        return NextResponse.json({ message: "OK", user: newUser });
-      } catch (dbError: any) {
-        console.error("Error creating user in database:", dbError);
+        // Safely extract data with validation
+        const eventData = evt?.data;
         
-        // Handle duplicate key error
-        if (dbError.code === 11000) {
+        if (!eventData || typeof eventData !== 'object') {
+          console.error("Event data is missing or invalid");
           return NextResponse.json(
-            { error: "User already exists" },
-            { status: 409 }
+            { error: "Event data is missing" },
+            { status: 400 }
           );
         }
 
+        const id = eventData?.id;
+        const email_addresses = eventData?.email_addresses;
+        const username = eventData?.username;
+
+        if (!id) {
+          console.error("User ID is missing in event data");
+          return NextResponse.json(
+            { error: "User ID is required but not provided" },
+            { status: 400 }
+          );
+        }
+
+        // Validate email_addresses exists and has at least one email
+        if (!email_addresses || !Array.isArray(email_addresses) || email_addresses.length === 0) {
+          console.error("No email addresses found in webhook data");
+          try {
+            console.error("Event data keys:", Object.keys(eventData || {}));
+            console.error("Email addresses value:", email_addresses);
+          } catch (e) {
+            console.error("Error logging debug info:", e);
+          }
+          return NextResponse.json(
+            { error: "Email address is required but not provided" },
+            { status: 400 }
+          );
+        }
+
+        // Get the first email address object with safety checks
+        const firstEmailObj = email_addresses[0];
+        if (!firstEmailObj || typeof firstEmailObj !== 'object' || firstEmailObj === null) {
+          console.error("First email object is invalid");
+          return NextResponse.json(
+            { error: "Invalid email address format" },
+            { status: 400 }
+          );
+        }
+
+        // Get the email address value with optional chaining
+        const email = firstEmailObj?.email_address;
+        if (!email || typeof email !== 'string' || email.trim() === '') {
+          console.error("Email address is missing or invalid");
+          return NextResponse.json(
+            { error: "Invalid email address format" },
+            { status: 400 }
+          );
+        }
+
+        // Generate username from email if not provided
+        const userUsername = username || email.split("@")[0];
+
+        const user = {
+          clerkId: id,
+          email: email,
+          username: userUsername,
+        };
+
+        try {
+          const newUser = await User.create(user);
+          const client = await clerkClient();
+
+          // Set public metadata
+          if (newUser) {
+            await client.users.updateUserMetadata(id, {
+              publicMetadata: {
+                userId: newUser._id.toString(),
+              },
+            });
+          }
+
+          return NextResponse.json({ message: "OK", user: newUser });
+        } catch (dbError: any) {
+          console.error("Error creating user in database:", dbError);
+          
+          // Handle duplicate key error
+          if (dbError.code === 11000) {
+            return NextResponse.json(
+              { error: "User already exists" },
+              { status: 409 }
+            );
+          }
+
+          return NextResponse.json(
+            { error: "Error creating user", details: dbError.message },
+            { status: 500 }
+          );
+        }
+      } catch (userCreatedError: any) {
+        console.error("Error processing user.created event:", userCreatedError);
+        console.error("Error stack:", userCreatedError?.stack);
+        console.error("Error details:", {
+          message: userCreatedError?.message,
+          name: userCreatedError?.name,
+        });
         return NextResponse.json(
-          { error: "Error creating user", details: dbError.message },
+          { 
+            error: "Error processing user.created event", 
+            details: userCreatedError?.message || "Unknown error",
+            stack: process.env.NODE_ENV === 'development' ? userCreatedError?.stack : undefined
+          },
           { status: 500 }
         );
       }
