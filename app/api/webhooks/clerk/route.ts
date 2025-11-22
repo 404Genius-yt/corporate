@@ -65,12 +65,34 @@ export async function POST(req: Request) {
 
     // CREATE
     if (eventType === "user.created") {
-      const { id, email_addresses, username,} = evt.data;
+      const { id, email_addresses, username } = evt.data;
+
+      // Validate email_addresses exists and has at least one email
+      if (!email_addresses || !Array.isArray(email_addresses) || email_addresses.length === 0) {
+        console.error("No email addresses found in webhook data:", evt.data);
+        return NextResponse.json(
+          { error: "Email address is required but not provided" },
+          { status: 400 }
+        );
+      }
+
+      // Get the first email address
+      const email = email_addresses[0]?.email_address;
+      if (!email) {
+        console.error("Email address is missing:", email_addresses);
+        return NextResponse.json(
+          { error: "Invalid email address format" },
+          { status: 400 }
+        );
+      }
+
+      // Generate username from email if not provided
+      const userUsername = username || email.split("@")[0];
 
       const user = {
         clerkId: id,
-        email: email_addresses[0].email_address,
-        username: username,
+        email: email,
+        username: userUsername,
       };
 
       try {
