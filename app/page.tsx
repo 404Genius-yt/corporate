@@ -37,24 +37,24 @@ const Home = () => {
           <span className="text-xl font-bold" style={{ color: '#0077B6' }}>JobMatch</span>
         </div>
         <div className="flex items-center gap-3">
-          <SignedOut>
-            <SignInButton mode="modal">
+          <button>
+            <Link href='/sign-in'>
               <button
                 className="px-4 py-2 rounded-lg font-medium transition-all hover:opacity-80"
                 style={{ color: '#0077B6' }}
               >
                 Sign In
               </button>
-            </SignInButton>
-            <SignUpButton mode="modal">
+            </Link>
+            <Link href='/sign-up'>
               <button
                 className="px-6 py-2 rounded-lg font-medium text-white transition-all hover:scale-105 shadow-lg"
                 style={{ backgroundColor: '#0077B6' }}
               >
                 Get Started
               </button>
-            </SignUpButton>
-          </SignedOut>
+            </Link>
+          </button>
           <SignedIn>
             <Link href="/profile">
               <button
