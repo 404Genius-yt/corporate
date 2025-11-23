@@ -14,10 +14,10 @@ export default function DashboardLayout({
   const pathname = usePathname()
 
   const menuItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: '📊' },
+    { href: '/opportunities', label: 'Dashboard', icon: '📊' },
     { href: '/dashboard/jobs', label: 'Job Opportunities', icon: '💼' },
     { href: '/dashboard/applications', label: 'My Applications', icon: '📝' },
-    { href: '/dashboard/profile', label: 'Profile', icon: '👤' },
+    { href: '/profile', label: 'Profile', icon: '👤' },
   ]
 
   const isActive = (href: string) => {
