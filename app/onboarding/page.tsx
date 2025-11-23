@@ -6,7 +6,7 @@ import { join } from 'path'
 import { connectToDatabase } from '@/lib/database/mongoose'
 import { User } from '@/lib/database/models/user.model'
 
-export const completeOnboarding = async (formData: FormData) => {
+const completeOnboarding = async (formData: FormData) => {
   const { userId } = await auth()
 
   if (!userId) return { error: 'Unauthorized' }
@@ -79,3 +79,5 @@ export const completeOnboarding = async (formData: FormData) => {
     return { error: 'Internal server error' }
   }
 }
+
+export default completeOnboarding
