@@ -8,6 +8,7 @@ export interface IUser {
   lastName: string;
   age: number;
   skill: string;
+  resume?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,6 +39,9 @@ const UserSchema = new Schema<IUser>({
     type: Number,
   },
   skill: {
+    type: String
+  },
+  resume: {
     type: String
   },
   createdAt: {

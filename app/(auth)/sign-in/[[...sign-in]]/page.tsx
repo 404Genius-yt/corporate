@@ -51,7 +51,6 @@ export default function SignInPage() {
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId })
-        router.push("/")
       }
     } catch (err: any) {
       // Try to extract error message safely
@@ -71,91 +70,169 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="grid w-full items-center px-4 sm:justify-center bg-[#FAFAFA]">
-      <form
-        onSubmit={handleSubmit}
-        className="
-          w-full space-y-6 rounded-2xl 
-          bg-white px-4 py-10 
-          shadow-lg 
-          ring-1 ring-inset ring-[#00B4D8]/30 
-          sm:w-96 sm:px-8
-        "
-      >
-        <header className="text-center">
-          <h1 className="mt-4 text-xl font-semibold tracking-tight text-[#222222]">
-            Sign in
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden" style={{ backgroundColor: '#FAFAFA' }}>
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-10 animate-float" style={{ backgroundColor: '#00B4D8', animationDuration: '6s' }}></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full opacity-10 animate-float" style={{ backgroundColor: '#0077B6', animationDuration: '8s' }}></div>
+        <div className="absolute top-1/2 right-1/4 w-64 h-64 rounded-full opacity-5 animate-float" style={{ backgroundColor: '#FFDD00', animationDuration: '7s' }}></div>
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Decorative header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 transform hover:scale-110 transition-transform" style={{ backgroundColor: '#FFDD00' }}>
+            <svg className="w-10 h-10" style={{ color: '#0077B6' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+            </svg>
+          </div>
+          <h1 className="text-4xl font-bold mb-3" style={{ color: '#222222' }}>
+            Welcome Back! 👋
           </h1>
-        </header>
-
-        {/* email */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-[#222222]">Email</label>
-          <input
-            value={email}
-            required
-            onChange={(e) => {
-              setEmail(e.target.value)
-              validateEmail(e.target.value)
-            }
-            }
-            className="
-              w-full rounded-md bg-[#FAFAFA] 
-              px-3.5 py-2 text-sm text-[#222222]
-              ring-1 ring-inset ring-[#00B4D8]/40
-              focus:ring-[#0077B6]
-            "
-          />
-          {emailError && <p className="text-xs text-red-500 mt-1">{emailError}</p>}
+          <p className="text-lg" style={{ color: '#222222', opacity: 0.7 }}>
+            Sign in to continue your journey
+          </p>
         </div>
 
-        {/* password */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-[#222222]">Password</label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value)
-            validatePassword(e.target.value)
-            }}
-            className="
-              w-full rounded-md bg-[#FAFAFA] 
-              px-3.5 py-2 text-sm text-[#222222]
-              ring-1 ring-inset ring-[#00B4D8]/40
-              focus:ring-[#0077B6]
-            "
-          />
-          {passwordError && <p className="text-xs text-red-500 mt-1">{passwordError}</p>}
-        </div>
-
-        {generalError && <p className="text-sm text-red-500 text-center">{generalError}</p>}
-
-        {/* sign in button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="
-            w-full rounded-md 
-            bg-[#0077B6] text-white 
-            px-3.5 py-2 text-center text-sm font-medium
-            hover:bg-[#00B4D8] transition
-          "
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 border-4 space-y-6"
+          style={{ borderColor: '#00B4D8' }}
         >
-          {loading ? "Signing in..." : "Sign In"}
-        </button>
+          {generalError && (
+            <div className="p-4 rounded-xl border-2 animate-shake" style={{ backgroundColor: '#FFDD00', borderColor: '#FFDD00', color: '#222222' }}>
+              <p className="text-sm font-medium">{generalError}</p>
+            </div>
+          )}
 
-        <p className="text-center text-sm text-[#222222]/60">
-          Don’t have an account?{" "}
-          <a
-            href="/sign-up"
-            className="font-medium text-[#0077B6] underline-offset-4 hover:underline"
+          {/* email */}
+          <div className="space-y-2">
+            <label className="flex text-sm font-semibold items-center gap-2" style={{ color: '#0077B6' }}>
+              <span>📧</span> Email
+            </label>
+            <input
+              value={email}
+              required
+              onChange={(e) => {
+                setEmail(e.target.value)
+                validateEmail(e.target.value)
+              }}
+              className="w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:scale-[1.02]"
+              style={{
+                borderColor: emailError ? '#FF0000' : '#00B4D8',
+                backgroundColor: '#FAFAFA',
+                color: '#222222',
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#0077B6'
+                e.target.style.boxShadow = '0 0 0 3px rgba(0, 119, 182, 0.1)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = emailError ? '#FF0000' : '#00B4D8'
+                e.target.style.boxShadow = 'none'
+              }}
+              placeholder="you@example.com"
+            />
+            {emailError && <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+              <span>⚠️</span> {emailError}
+            </p>}
+          </div>
+
+          {/* password */}
+          <div className="space-y-2">
+            <label className="flex text-sm font-semibold items-center gap-2" style={{ color: '#0077B6' }}>
+              <span>🔒</span> Password
+            </label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                validatePassword(e.target.value)
+              }}
+              className="w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:scale-[1.02]"
+              style={{
+                borderColor: passwordError ? '#FF0000' : '#00B4D8',
+                backgroundColor: '#FAFAFA',
+                color: '#222222',
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#0077B6'
+                e.target.style.boxShadow = '0 0 0 3px rgba(0, 119, 182, 0.1)'
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = passwordError ? '#FF0000' : '#00B4D8'
+                e.target.style.boxShadow = 'none'
+              }}
+              placeholder="Enter your password"
+            />
+            {passwordError && <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+              <span>⚠️</span> {passwordError}
+            </p>}
+          </div>
+
+          {/* sign in button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full font-bold py-4 px-6 rounded-xl duration-300 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all disabled:cursor-not-allowed disabled:transform-none relative overflow-hidden"
+            style={{
+              backgroundColor: loading ? '#00B4D8' : '#0077B6',
+              color: 'white',
+              opacity: loading ? 0.9 : 1,
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = '#00B4D8'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = '#0077B6'
+              }
+            }}
           >
-            Create one
-          </a>
-        </p>
-      </form>
+            {loading && (
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+            )}
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing in...
+                  <span className="text-xl animate-pulse">⏳</span>
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <span className="text-xl">🚀</span>
+                </>
+              )}
+            </span>
+          </button>
+
+          <p className="text-center text-sm" style={{ color: '#222222', opacity: 0.7 }}>
+            Don't have an account?{" "}
+            <a
+              href="/sign-up"
+              className="font-semibold hover:underline transition-all"
+              style={{ color: '#0077B6' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#00B4D8'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#0077B6'
+              }}
+            >
+              Create one
+            </a>
+          </p>
+        </form>
+      </div>
     </div>
   )
 }
